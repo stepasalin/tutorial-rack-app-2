@@ -3,20 +3,46 @@ require 'pry'
 require 'redis'
 require 'json'
 
-# ДЗ 1
-# добавить в сервис валидации
-# не должно быть возможности прислать невалидный JSON. Если таковой прислали - давать соответствующий ответ.
-# не должно быть возможности прислать JSON без полей name и age. Придумать ответ
-# ДОП валидации на name и age: name от 3 до 20 символов латиница, age - число больше нуля. Если нарушены - давать ответ.
+def valid_latin_string?(str)
+  /^[A-Za-z]+$/.match?(str)
+end
 
- run do |raw_request|
-   parsed_request = Rack::Request.new(raw_request)
-   if parsed_request.post? && parsed_request.path == '/api/user/new'
-    body = parsed_request.body.read
-    redis = Redis.new
-    parsed_body = JSON.parse(body)
-    name = parsed_body['name']
+def valid_json?(json_str)
+  parsed_json = JSON.parse(json_str)
+  true
+rescue JSON::ParserError
+  false
+  #return false unless parsed_json.is_a?(Hash)
+
+  #required_fields = ['name', 'age']
+  #required_fields.all? { |field| parsed_json.key?(field) }
+
+end
+
+run do |raw_request|
+  redis = Redis.new
+  parsed_request = Rack::Request.new(raw_request)
+  body = parsed_request.body.read
+  parsed_body = JSON.parse(body)
+  name = parsed_body['name']
+  age = parsed_body['age'].to_i
+
+  if !parsed_request.post?
+    [501,{},['Not Implemented. Please try method "POST"!']]
+  elsif !parsed_request.path == '/api/user/new'
+    [400,{},['Bad Request. Please try path "/api/user/new"!']]
+  elsif !name
+    [400,{},['ERROR! Field "name" is not found']]
+  elsif !(name.size >=3 && name.size <=20)
+    [400,{},['ERROR! The length of the name should be from 3 to 20 characters!']]
+  elsif !valid_latin_string?(name)
+    [400,{},['ERROR! The name must contain only Latin characters!']]
+  elsif !(age>0 && age<100)
+    [400,{},['ERROR! The age should be in the range from 0 to 100!']]
+  else
     redis.set(name, body)
     [201,{},['User has been created!']]
-   end
- end
+  end
+  rescue JSON::ParserError
+    [400, {}, ['ERROR! Invalid JSON format!']]
+end
