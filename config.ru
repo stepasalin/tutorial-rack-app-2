@@ -9,7 +9,6 @@ require 'json'
 # не должно быть возможности прислать JSON без полей name и age. Придумать ответ
 # ДОП валидации на name и age: name от 3 до 20 символов латиница, age - число больше нуля. Если нарушены - давать ответ.
 
- 
 
 
 
@@ -21,7 +20,17 @@ require 'json'
   name = parsed_body['name']
   age = parsed_body['age']
 
-  if parsed_request.post? && parsed_request.path == '/api/user/new'
+  if parsed_request.get? && parsed_request.path.start_with?('/api/user/')
+    requested_name = parsed_request.path.gsub('/api/user/',"")
+    output = redis.get(requested_name)
+    if output
+      [200, {}, [output]] 
+    else
+      [404, {}, ["User #{requested_name} is not found"]]
+    end
+
+
+  elsif parsed_request.post? && parsed_request.path == '/api/user/new'
     if parsed_body.nil?
       [400, {}, ['body is empty (Bad request)']]
     elsif !name && !age
@@ -44,5 +53,3 @@ require 'json'
 rescue JSON::ParserError
   [400, {}, ['JSON format is invalid']]
 end
-
-#valid_json = JSON.parse(body)
