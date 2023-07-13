@@ -36,20 +36,11 @@ end
     age = parsed_body['age'].to_i
     req_user = User.new(name, age)
 
-    if parsed_body.nil?
-      [400,{},['ERROR! JSON is absent!']]
-    # elsif !name && !age
-    #   [400,{},['ERROR! Fields "name" and "age" is not found']]
-    # elsif !name
-    #   [400,{},['ERROR! Field "name" is not found']]
-    # elsif !age
-    #   [400,{},['ERROR! Field "age" is not found']]
-    elsif req_user.valid
+    if req_user.valid
       redis.set(name, body)
       [201,{},['User has been created!']]
     else
       [422,{},req_user.errors]
-      
     end
   end
 rescue JSON::ParserError
