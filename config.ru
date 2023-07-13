@@ -2,22 +2,14 @@ require 'rack'
 require 'pry'
 require 'redis'
 require 'json'
-require_relative './user.rb'
+require_relative 'models/user.rb'
+require_relative 'controllers/user.rb'
 
-def valid_latin_string?(str)
-  /^[A-Za-z]+$/.match?(str)
-end
-
-def valid_json?(json_str)
-  parsed_json = JSON.parse(json_str)
-  true
-rescue JSON::ParserError
-  false
-end
 
  run do |raw_request|
   redis = Redis.new
   parsed_request = Rack::Request.new(raw_request)
+  UserController.new(parsed_request)
   body = parsed_request.body.read
 
 
@@ -46,3 +38,8 @@ end
 rescue JSON::ParserError
   [400, {}, ['ERROR! Invalid JSON format!']]
 end
+
+
+# if req.post? && req.path = ....
+#   UserController.create(req)
+# elsif ...
