@@ -25,8 +25,8 @@ run do |raw_request|
     req_user = User.new(name, age, body)
     
     if req_user.valid
-      req_user.create_user
-      [201, {}, "User has been created"]
+      req_user.create_user()
+      [201, {}, ["User has been created"]]
     else
       [422, {}, req_user.errors]
     end

@@ -1,5 +1,6 @@
 require 'json'
 require 'redis'
+require 'pry'
 
 class User
 
@@ -36,11 +37,9 @@ class User
   end
 
   def create_user
-    if name_valid? && age_valid?
-      redis = Redis.new
-      redis.set(@name, @body)
-      [201, {}, ['User has been created!']]
-    else [422, {}, @errors]
-    end
+    puts "Creating user: #{@name}"
+    puts "Creating user: #{@body}"
+    redis = Redis.new
+    redis.set(@name, @body)
   end
 end
