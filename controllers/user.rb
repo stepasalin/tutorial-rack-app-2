@@ -7,29 +7,26 @@ class UserController
 
   def initialize(parsed_request)
     @parsed_request = parsed_request
-    @body = parsed_request.body.read
-    @name = JSON.parse(@body)["name"]
-    @age = JSON.parse(@body)["age"]
-    @valid = valid
-  end
-
-  def valid
-    @errors = []
-    @errors << "body is empty (Bad request). \n" unless @body
-    @errors << "Fiend 'name' is absent. \n" unless @name
-    @errors << "Field 'age' is absent. \n" unless @age
-    @errors.empty?
+    @raw_body = parsed_request.body.read
   end
 
   def create_user
-    test = User.new(@name, @age)
-    if valid && test.valid
-      redis = Redis.new
-      redis.set(@name, @body)
-      [201, {}, ["User has been created"]]
-    else
-      response = @errors + test.errors
-      [422, {}, response]
+    parsed_body = JSON.parse(@raw_body)
+    errors = []
+    errors << "Fiend 'name' is absent. \n" unless parsed_body["name"]
+    errors << "Field 'age' is absent. \n" unless parsed_body["age"]
+
+    if errors.any?
+      [422, {}, errors]
+    else 
+      new_user = User.new(parsed_body["name"], parsed_body["age"].to_i)
+      if new_user.valid
+        redis = Redis.new
+        redis.set(parsed_body["name"], @raw_body)
+        [201, {}, ["User has been created"]]
+      else
+        [422, {}, new_user.errors]
+      end
     end
   end
 
