@@ -7,7 +7,7 @@ class User
   attr_reader :name, :age, :errors
 
   def initialize(name, age)
-    @name = name.to_s
+    @name = name
     @age = age
     @valid = valid
   end
