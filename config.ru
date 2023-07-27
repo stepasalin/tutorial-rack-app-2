@@ -6,14 +6,18 @@ require_relative 'models/user.rb'
 require_relative 'controllers/user.rb'
 
 run do |raw_request|
-  parsed_request = Rack::Request.new(raw_request)
-
-  if parsed_request.get? && parsed_request.path.start_with?('/api/user/')
-    UserController.new(parsed_request).find_user
-  elsif parsed_request.post? && parsed_request.path == '/api/user/new'
-    UserController.new(parsed_request).create_user
+  pars_req = Rack::Request.new(raw_request)
+  if pars_req.get? && pars_req.path.start_with?('/api/user/')
+    UserController.new(pars_req).find_user
+  elsif pars_req.post? && pars_req.path == '/api/user/new'
+    UserController.new(pars_req).create_user
+  elsif pars_req.put? && pars_req.path == '/api/user/modify'
+    UserController.new(pars_req).modify_user
+  elsif pars_req.delete? && pars_req.path == '/api/user/delete'
+    UserController.new(pars_req).delete_user
+  else
+    [404, {}, ['Not Found']] 
   end
-
 rescue JSON::ParserError
   [400, {}, ['JSON format is invalid']]
 end

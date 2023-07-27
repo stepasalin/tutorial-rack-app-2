@@ -20,4 +20,18 @@ class User
     @errors.empty?
   end
 
+  def self.save(a, b)
+    redis = Redis.new
+    redis.set(a, b)
+  end
+
+  def self.find(c)
+    redis1 = Redis.new
+    redis1.get(c)
+  end
+
+  def self.delete(d)
+    redis2 = Redis.new
+    redis2.del(d)
+  end
 end
