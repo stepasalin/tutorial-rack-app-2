@@ -21,7 +21,8 @@ class UserController
     new_user = User.new(@parsed_body["name"], @parsed_body["age"].to_i)
     return [422, {}, new_user.errors] unless new_user.valid
 
-    User.save(@parsed_body["name"], @raw_body)
+    #User.save(@parsed_body["name"], @raw_body)
+    new_user.save_1
     
     [201, {}, ["User has been created"]]
   end

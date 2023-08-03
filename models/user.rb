@@ -20,18 +20,28 @@ class User
     @errors.empty?
   end
 
+  def to_json
+    { name: @name, age: @age }.to_json
+  end
+
+  def save_1
+    redis = Redis.new
+    redis.set(@name, to_json)
+
+  end
+
   def self.save(a, b)
     redis = Redis.new
     redis.set(a, b)
   end
 
   def self.find(c)
-    redis1 = Redis.new
-    redis1.get(c)
+    redis = Redis.new
+    redis.get(c)
   end
 
   def self.delete(d)
-    redis2 = Redis.new
-    redis2.del(d)
+    redis = Redis.new
+    redis.del(d)
   end
 end
