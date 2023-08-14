@@ -20,4 +20,23 @@ class User
     @errors.empty?
   end
 
+  def to_json
+    { name: @name, age: @age }.to_json
+  end
+
+  def save_1
+    redis = Redis.new
+    redis.set(@name, to_json)
+  end
+
+  def self.save(name, body)
+    redis = Redis.new
+    redis.set(name, body)
+  end
+
+  def self.find(user)
+    redis = Redis.new
+    redis.get(user)
+  end
+
 end
