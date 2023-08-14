@@ -4,7 +4,7 @@ require 'pry'
 
 class User
 
-  attr_reader :name, :age, :errors
+  attr_accessor :name, :age, :errors
 
   def initialize(name, age)
     @name = name
@@ -20,4 +20,32 @@ class User
     @errors.empty?
   end
 
+  def to_json
+    { name: @name, age: @age }.to_json
+  end
+
+  def save_1
+    redis = Redis.new
+    redis.set(@name, to_json)
+
+  end
+
+  def self.save(a, b)
+    redis = Redis.new
+    redis.set(a, b)
+  end
+
+  def self.find(c)
+    redis = Redis.new
+    redis_result = redis.get(c)
+    return nil if redis_result.nil?
+
+    parsed_result = JSON.parse(redis_result)
+    User.new(parsed_result['name'], parsed_result['age'])
+  end
+
+  def self.delete(d)
+    redis = Redis.new
+    redis.del(d)
+  end
 end
