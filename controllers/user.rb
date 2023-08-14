@@ -29,10 +29,10 @@ class UserController
 
   def find_user
     requested_name = @pars_req.path.gsub('/api/user/',"")
-    user_value = User.find(requested_name)
-    return [200, {}, [user_value]] if user_value
+    user = User.find(requested_name)
+    return [404, {}, ["User #{requested_name} is not found"]] if user.nil?
     
-    [404, {}, ["User #{requested_name} is not found"]]
+    [200, {}, [user.to_json]]
   end 
 
   def modify_user
@@ -40,7 +40,7 @@ class UserController
     errors << "Fiend 'name' is absent. \n" unless @parsed_body["name"]
     errors << "Field 'age' is absent. \n" unless @parsed_body["age"]
     return [422, {}, errors] if errors.any?
-    return [422, {}, ["User #{@parsed_body["name"]} is not found to modify"]] unless User.find(@parsed_body["name"])
+    return [422, {}, ["User #{@parsed_body["name"]} is not found to modify"]] unless User.find(@parsed_body["name"]) & 
     
     User.save(@parsed_body["name"], @raw_body)
     [201, {}, ["Value was changed to #{@raw_body}"]]

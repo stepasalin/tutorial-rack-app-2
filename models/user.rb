@@ -37,7 +37,11 @@ class User
 
   def self.find(c)
     redis = Redis.new
-    redis.get(c)
+    redis_result = redis.get(c)
+    return nil if redis_result.nil?
+
+    parsed_result = JSON.parse(redis_result)
+    User.new(parsed_result['name'], parsed_result['age'])
   end
 
   def self.delete(d)
