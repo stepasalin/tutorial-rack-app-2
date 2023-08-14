@@ -4,7 +4,7 @@ require 'pry'
 
 class User
 
-  attr_reader :name, :age, :errors
+  attr_accessor :name, :age, :errors
 
   def initialize(name, age)
     @name = name
