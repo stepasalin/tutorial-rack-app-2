@@ -4,3 +4,4 @@ source 'https://rubygems.org'
  gem "rackup", "~> 0.2.2"
  gem 'pry'
  gem 'redis'
+ gem 'rspec'
