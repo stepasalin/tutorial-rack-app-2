@@ -14,7 +14,7 @@ class UserController
 
   def create_user
     errors = []
-    errors << "Fiend 'name' is absent. \n" unless @parsed_body["name"]
+    errors << "Field 'name' is absent. \n" unless @parsed_body["name"]
     errors << "Field 'age' is absent. \n" unless @parsed_body["age"]
     return [422, {}, errors] if errors.any?
 
@@ -37,7 +37,7 @@ class UserController
 
   def modify_user
     errors = []
-    errors << "Fiend 'name' is absent. \n" unless @parsed_body["name"]
+    errors << "Field 'name' is absent. \n" unless @parsed_body["name"]
     errors << "Field 'age' is absent. \n" unless @parsed_body["age"]
     return [422, {}, errors] if errors.any?
     
@@ -53,7 +53,7 @@ class UserController
 
   def delete_user
     errors = []
-    errors << "Fiend 'name' is absent. \n" unless @parsed_body["name"]
+    errors << "Field 'name' is absent. \n" unless @parsed_body["name"]
     return [422, {}, errors] if errors.any?
     return [422, {}, ["User #{@parsed_body["name"]} is not found to delete"]] unless User.find(@parsed_body["name"])
     

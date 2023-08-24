@@ -12,9 +12,9 @@ GEM
     rackup (0.2.3)
       rack (>= 3.0.0.beta1)
       webrick
-    redis (5.0.6)
+    redis (5.0.7)
       redis-client (>= 0.9.0)
-    redis-client (0.14.1)
+    redis-client (0.16.0)
       connection_pool
     rspec (3.12.0)
       rspec-core (~> 3.12.0)

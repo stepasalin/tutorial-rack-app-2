@@ -1,3 +1,4 @@
+=begin
 class PlusOne
   def initialize(number)
     raise 'Not a number' unless number.is_a?(Integer)
@@ -37,3 +38,4 @@ RSpec.describe PlusOne do
   end
 end
 
+=end
