@@ -36,4 +36,27 @@ describe 'API' do
     # а откуда возьмется юзер в базе? фантазируйте!
     # не стесняйтесь пользоваться моделью User!
   #end
+  it 'finds user with a Get' do
+    request_params = {
+      'REQUEST_PATH' => '/api/user/new',
+      'PATH_INFO'=> '/api/user/new',
+      'REQUEST_METHOD' => 'POST',
+      'rack.input' => StringIO.new('{"name": "Kolya","age": 90000}')
+    }
+    response = app.call(request_params)
+    request_params_get = {
+      'REQUEST_PATH' => '/api/user/Kolya',
+      'PATH_INFO'=> '/api/user/Kolya',
+      'REQUEST_METHOD' => 'GET'
+    }
+    response_get = app.call(request_params_get)
+    #expect(response_get).to eq([200,{},['{"name": "Kolya","age": 90000}']])
+    response_body = JSON.parse(response_get[2].first)
+    response_code = response_get[0]
+    response_name = response_body["name"]
+    response_age = response_body["age"]
+    expect(response_code).to eq(200)
+    expect(response_name).to eq("Kolya")
+    expect(response_age).to eq(90000)
+  end
 end

@@ -8,8 +8,8 @@ class UserController
 
   def initialize(pars_req)
     @pars_req = pars_req
-    @raw_body = pars_req.body.read
-    @parsed_body = JSON.parse(@raw_body)
+    @raw_body = pars_req.body&.read
+    @parsed_body = JSON.parse(@raw_body) if @raw_body
   end
 
   def create_user
