@@ -8,8 +8,8 @@ class UserController
 
   def initialize(pars_req)
     @pars_req = pars_req
-    @raw_body = pars_req.body.read
-    @parsed_body = JSON.parse(@raw_body)
+    @raw_body = pars_req.body&.read
+    @parsed_body = JSON.parse(@raw_body) if @raw_body
   end
 
   def create_user
@@ -21,7 +21,6 @@ class UserController
     new_user = User.new(@parsed_body["name"], @parsed_body["age"].to_i)
     return [422, {}, new_user.errors] unless new_user.valid
 
-    #User.save(@parsed_body["name"], @raw_body)
     new_user.save_1
     
     [201, {}, ["User has been created"]]
@@ -58,6 +57,6 @@ class UserController
     return [422, {}, ["User #{@parsed_body["name"]} is not found to delete"]] unless User.find(@parsed_body["name"])
     
     User.delete(@parsed_body["name"])
-    [201, {}, ["Value was deleled"]]
+    [200, {}, ["Value was deleled"]]
   end
 end

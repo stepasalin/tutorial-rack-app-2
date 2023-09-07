@@ -30,11 +30,6 @@ class User
 
   end
 
-  def self.save(a, b)
-    redis = Redis.new
-    redis.set(a, b)
-  end
-
   def self.find(c)
     redis = Redis.new
     redis_result = redis.get(c)

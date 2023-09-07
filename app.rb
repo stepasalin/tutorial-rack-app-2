@@ -8,6 +8,7 @@ require_relative 'controllers/user.rb'
 class App
   def call(request_params)
     pars_req = Rack::Request.new(request_params)
+    #binding.pry
     if pars_req.get? && pars_req.path.start_with?('/api/user/')
       UserController.new(pars_req).find_user
     elsif pars_req.post? && pars_req.path == '/api/user/new'
