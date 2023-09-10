@@ -1,7 +1,19 @@
 require_relative '../app'
+require_relative '../helpers/application_helper'
 
-describe 'API - ' do
+describe 'API - tests' do
   let(:app) { App.new }
+ 
+  before(:each) do
+    name = generate_random_name()
+    age = generate_random_age
+  end
+
+  it 'Check positiv3e Search of user' do
+    create_user(name, age)
+    response = get("/api/user/#{name}")
+    expect (response).to eq([200,{},["{'name':#{name},'age':#{age}}"]])
+  end
 
   it 'Check positive CREATION of user' do
     env = {
@@ -120,5 +132,4 @@ describe 'API - ' do
     expect(response).to eq([422, {}, ["User rishdeldel is not found to delete"]])
     expect(new_user).to be_nil 
   end
-
 end
