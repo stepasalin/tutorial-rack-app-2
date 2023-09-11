@@ -27,7 +27,6 @@ class User
   def save
     redis = Redis.new
     redis.set(@name, to_json)
-
   end
 
   def self.save(a, b)

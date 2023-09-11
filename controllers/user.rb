@@ -14,6 +14,7 @@ class UserController
 
   def create_user
     errors = []
+    errors << "User #{@parsed_body["name"]} already exist. \n" if User.find(@parsed_body["name"])
     errors << "Fiend 'name' is absent. \n" unless @parsed_body["name"]
     errors << "Field 'age' is absent. \n" unless @parsed_body["age"]
     return [422, {}, errors] if errors.any?

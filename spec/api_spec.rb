@@ -6,6 +6,7 @@ describe 'API - tests' do
   let(:app) { App.new }
 
   before(:each) do
+    Redis.new.flushall
     @valid_name = generate_random_valid_name
     @valid_age = generate_random_valid_age
     @invalid_name = generate_random_invalid_name
