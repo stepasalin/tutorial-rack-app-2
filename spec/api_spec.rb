@@ -3,16 +3,31 @@ require_relative '../helpers/application_helper'
 
 describe 'API - tests' do
   let(:app) { App.new }
- 
-  before(:each) do
-    name = generate_random_name()
-    age = generate_random_age
+  let(:valid_name) { generate_random_valid_name }
+  let(:valid_age) { generate_random_valid_age }
+  let(:invalid_name) { generate_random_invalid_name }
+  let(:invalid_age) { generate_random_invalid_age }
+  let(:expected_hash) { { "name" => valid_name, "age" => valid_age } }
+
+
+
+  it 'SEARCH(positive)' do
+    create_user(valid_name, valid_age)
+    response = get("/api/user/#{valid_name}")
+    response_hash = JSON.parse(response[2][0])
+    expect(response_hash.keys).to eq(expected_hash.keys)
   end
 
-  it 'Check positiv3e Search of user' do
+  it 'CREATION(positive)' do
+    response = post("/api/user/new", valid_name, valid_age)
+    expect(response).to eq([201,{},['User has been created']])
+  end
+
+  it 'Check positive Search of user' do
     create_user(name, age)
     response = get("/api/user/#{name}")
-    expect (response).to eq([200,{},["{'name':#{name},'age':#{age}}"]])
+    expected_json = "{\"name\":\"#{name}\",\"age\":#{age}}"
+    expect(response).to eq([200, {}, [expected_json]])
   end
 
   it 'Check positive CREATION of user' do

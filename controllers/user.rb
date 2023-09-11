@@ -23,7 +23,7 @@ class UserController
 
     new_user.save_1
     
-    [201, {}, ["User has been created"]]
+    [201, {}, ["User has been created- "]]
   end
 
   def find_user
