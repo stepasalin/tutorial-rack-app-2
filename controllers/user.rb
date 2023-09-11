@@ -21,8 +21,7 @@ class UserController
     new_user = User.new(@parsed_body["name"], @parsed_body["age"].to_i)
     return [422, {}, new_user.errors] unless new_user.valid
 
-    #User.save(@parsed_body["name"], @raw_body)
-    new_user.save_1
+    new_user.save
     
     [201, {}, ["User has been created"]]
   end
@@ -47,7 +46,7 @@ class UserController
     user.age = @parsed_body["age"]
     return [422, {}, user.errors] unless user.valid
     
-    user.save_1
+    user.save
     [201, {}, ["Value was changed to #{user.to_json}"]]
   end
 
@@ -58,6 +57,6 @@ class UserController
     return [422, {}, ["User #{@parsed_body["name"]} is not found to delete"]] unless User.find(@parsed_body["name"])
     
     User.delete(@parsed_body["name"])
-    [201, {}, ["Value was deleled"]]
+    [200, {}, ["Value was deleled"]]
   end
 end

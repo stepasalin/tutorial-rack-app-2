@@ -1,62 +1,57 @@
 require_relative '../app'
+require_relative '../helpers/application_helper'
 
-# любой request-тест имеет следуюущую структуру
-# сетап (создание App, возможно что-то в базе)
-# отправка запроса
-# проверка ответа
-# (опционально) проверка базы
 
-describe 'API' do
+describe 'API - tests' do
   let(:app) { App.new }
 
-  it 'creates User' do
-    # под сомнением - create
-    # все остальное, в частности find, считается "рабочим"
-    request_params = {
-      'REQUEST_PATH' => '/api/user/new',
-      'PATH_INFO'=> '/api/user/new',
-      'REQUEST_METHOD' => 'POST',
-      'rack.input' => StringIO.new('{"name": "Kolya","age": 90000}')
-    }
-    response = app.call(request_params)
-    new_user = User.find('Kolya')
-
-    # проверка ответа
-    expect(response).to eq([201,{},['User has been created']])
-    # проверка состояния базы
-    expect(new_user).not_to be_nil # RSpec cheat sheet
+  before(:each) do
+    @valid_name = generate_random_valid_name
+    @valid_age = generate_random_valid_age
+    @invalid_name = generate_random_invalid_name
+    @invalid_age = generate_random_invalid_age
+    @expected_hash = { "name" => @valid_name, "age" => @valid_age }
+    @json_string = @expected_hash.to_json
   end
 
-  #if 'finds user with a Get' do
-    # под сомнением: поиск юзеров в базе и их выдача
-    # все остальное в проекте на минутку считается точно рабочим
-    # ДЗ
-    # сформировать request_params аналогичные GET-запросу
-    # проверить, что в ответе лежит правильный JSON с юзером
-    # а откуда возьмется юзер в базе? фантазируйте!
-    # не стесняйтесь пользоваться моделью User!
-  #end
-  it 'finds user with a Get' do
+
+  it 'CREATE user' do
+    response = post("/api/user/new", @json_string)
+    expect(response.code).to eq(201)
+    expect(response.body_string).to eq("User has been created")
+    expect(User.find(@valid_name)).not_to be_nil
+  end
+
+  it 'GET user' do
+    create_user(@valid_name, @valid_age)
+    response = get("/api/user/#{@valid_name}")
+    expect(response.body_hash).to eq(@expected_hash)
+    expect(response.code).to eq(200)
+  end
+
+  it 'UPDATE user' do
+    create_user(@valid_name, @valid_age+1)
+    response = put("/api/user/modify", @json_string)
+    expect(response.code).to eq(201)
+    expect(response.body_hash).to eq(@expected_hash)
+    expect(User.find(@valid_name)).not_to be_nil
+  end
+
+  it 'DELETE user' do
+    user = User.new('Mark', '88')
+    user.save
     request_params = {
-      'REQUEST_PATH' => '/api/user/new',
-      'PATH_INFO'=> '/api/user/new',
-      'REQUEST_METHOD' => 'POST',
-      'rack.input' => StringIO.new('{"name": "Kolya","age": 90000}')
+      'REQUEST_PATH' => '/api/user/delete',
+      'PATH_INFO'=> '/api/user/delete',
+      'REQUEST_METHOD' => 'DELETE',
+      'rack.input' => StringIO.new('{"name":"Mark"}')
     }
     response = app.call(request_params)
-    request_params_get = {
-      'REQUEST_PATH' => '/api/user/Kolya',
-      'PATH_INFO'=> '/api/user/Kolya',
-      'REQUEST_METHOD' => 'GET'
-    }
-    response_get = app.call(request_params_get)
-    #expect(response_get).to eq([200,{},['{"name": "Kolya","age": 90000}']])
-    response_body = JSON.parse(response_get[2].first)
-    response_code = response_get[0]
-    response_name = response_body["name"]
-    response_age = response_body["age"]
-    expect(response_code).to eq(200)
-    expect(response_name).to eq("Kolya")
-    expect(response_age).to eq(90000)
+    new_user = User.find('Mark')
+
+    expect(response).to eq([200, {}, ["Value was deleled"]])
+    expect(new_user).to be_nil 
   end
+
+
 end
