@@ -21,9 +21,9 @@ class UserController
     new_user = User.new(@parsed_body["name"], @parsed_body["age"].to_i)
     return [422, {}, new_user.errors] unless new_user.valid
 
-    new_user.save_1
+    new_user.save
     
-    [201, {}, ["User has been created- "]]
+    [201, {}, ["User has been created"]]
   end
 
   def find_user
@@ -46,7 +46,7 @@ class UserController
     user.age = @parsed_body["age"]
     return [422, {}, user.errors] unless user.valid
     
-    user.save_1
+    user.save
     [201, {}, ["Value was changed to #{user.to_json}"]]
   end
 

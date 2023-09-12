@@ -24,10 +24,9 @@ class User
     { name: @name, age: @age }.to_json
   end
 
-  def save_1
+  def save
     redis = Redis.new
     redis.set(@name, to_json)
-
   end
 
   def self.find(c)
