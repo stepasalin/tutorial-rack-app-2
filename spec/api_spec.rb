@@ -33,7 +33,7 @@ describe 'API - tests' do
     response = put("/api/user/modify", @json_string)
     expect(response.code).to eq(201)
     expect(response.body_hash).to eq(@expected_hash)
-    expect(User.find(@valid_name)).not_to be_nil
+    expect(User.find(@valid_name)).not_to be_nil #поменять
   end
 
   # it 'CREATION(negative)' do
