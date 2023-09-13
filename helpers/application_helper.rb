@@ -13,7 +13,9 @@ class Response
   end
 
   def body_hash
-    JSON.parse(@response_array[2][0])
+    return JSON.parse(body_string.sub('Value was changed to ', '')) if body_string.include?('Value was changed to')
+    
+    JSON.parse(body_string)
   end
 end
 
@@ -63,13 +65,13 @@ def post(path, json_string)
   response = Response.new(response_array)
 end
 
-def put(path, name, age)
+def put(path, json_string)
   req_params = {
     'REQUEST_PATH' => path,
     'PATH_INFO'=> path,
     'REQUEST_METHOD' => 'PUT',
-    'rack.input' => StringIO.new("{\"name\":\"#{name}\", \"age\":\"#{age}\"}"),
+    'rack.input' => StringIO.new(json_string),
   }
-  response = app.call(req_params)
-  return response
+  response_array = app.call(req_params)
+  response = Response.new(response_array)
 end

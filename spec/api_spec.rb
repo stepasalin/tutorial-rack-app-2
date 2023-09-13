@@ -28,6 +28,14 @@ describe 'API - tests' do
     expect(response.body_string).to eq("User has been created")
   end
 
+  it 'MODIFY(positive)' do
+    create_user(@valid_name, @valid_age+1)
+    response = put("/api/user/modify", @json_string)
+    expect(response.code).to eq(201)
+    expect(response.body_hash).to eq(@expected_hash)
+    expect(User.find(@valid_name)).not_to be_nil
+  end
+
   # it 'CREATION(negative)' do
   #   response = post("/api/user/new", @invalid_name, @invalid_age)
   #   expect(response).to eq([422, {}, ["Name length should be between 3 and 20 characters. \n", "Age must be a positive value, actual value = #{@invalid_age}. \n"]])
