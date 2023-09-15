@@ -24,32 +24,54 @@ describe 'API - tests' do
   end
 
   it 'SEARCH(negative)' do
-    create_user(@valid_name, @valid_age)
-    response = get("/api/user/#{@invalid_name}")
+    non_existing_user_name = generate_random_valid_name
+    response = get("/api/user/#{non_existing_user_name}")
     expect(response.code).to eq(404)
-    expect(response.body_string).to eq("User #{@invalid_name} is not found")
-    expect(User.find(@invalid_name)).to be_nil
+    expect(response.body_string).to eq("User #{non_existing_user_name} is not found")
   end
 
   it 'CREATION(positive)' do
-    response = post("/api/user/new", @json_string)
+    response = post("/api/user/new", {"name" => @valid_name, "age" => @valid_age}.to_json)
     expect(response.code).to eq(201)
     expect(response.body_string).to eq("User has been created")
   end
 
+  it 'CREATION(negative)' do
+    response = post("/api/user/new", {"name" => @invalid_name, "age" => @invalid_age}.to_json)
+    expect(response.code).to eq(422)
+    expect(response.body_string).to match_array(["Name length should be between 3 and 20 characters. \n", "Age must be a positive value, actual value = #{@invalid_age}. \n"])
+    expect(User.find(@invalid_name)).to be_nil 
+  end
+
   it 'MODIFY(positive)' do
     create_user(@valid_name, @valid_age+1)
-    response = put("/api/user/modify", @json_string)
+    response = put("/api/user/modify", {"name" => @valid_name, "age" => @valid_age}.to_json)
     expect(response.code).to eq(201)
     expect(response.body_hash).to eq(@expected_hash)
     expect(User.find(@valid_name).age).to eq(@valid_age)
   end
 
   it 'MODIFY(negative)' do
-    response = put("/api/user/modify", @json_string)
+    non_existing_user_name = generate_random_valid_name
+    response = put("/api/user/modify", {"name" => non_existing_user_name, "age" => @valid_age}.to_json)
     expect(response.code).to eq(404)
-    expect(response.body_string).to eq("User #{@valid_name} is not found to modify")
+    expect(response.body_string).to eq("User #{non_existing_user_name} is not found to modify")
+    expect(User.find(non_existing_user_name)).to be_nil 
+  end
+
+  it 'DELETE(positive)' do
+    create_user(@valid_name, @valid_age)
+    response = delete("/api/user/delete", {"name" => @valid_name}.to_json)
+    expect(response.code).to eq(200)
+    expect(response.body_string).to eq("Value was deleled")
     expect(User.find(@valid_name)).to be_nil 
+  end
+
+  it 'DELETE(negative)' do
+    non_existing_user_name = generate_random_valid_name
+    response = delete("/api/user/delete", {"name" => non_existing_user_name}.to_json)
+    expect(response.code).to eq(422)
+    expect(response.body_string).to eq("User #{non_existing_user_name} is not found to delete")
   end
 
 
