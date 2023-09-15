@@ -6,6 +6,7 @@ describe 'API - tests' do
   let(:app) { App.new }
 
   before(:each) do
+    Redis.new.flushall
     @valid_name = generate_random_valid_name
     @valid_age = generate_random_valid_age
     @invalid_name = generate_random_invalid_name
@@ -22,6 +23,14 @@ describe 'API - tests' do
     expect(User.find(@valid_name)).not_to be_nil
   end
 
+  it 'SEARCH(negative)' do
+    create_user(@valid_name, @valid_age)
+    response = get("/api/user/#{@invalid_name}")
+    expect(response.code).to eq(404)
+    expect(response.body_string).to eq("User #{@invalid_name} is not found")
+    expect(User.find(@invalid_name)).to be_nil
+  end
+
   it 'CREATION(positive)' do
     response = post("/api/user/new", @json_string)
     expect(response.code).to eq(201)
@@ -33,8 +42,32 @@ describe 'API - tests' do
     response = put("/api/user/modify", @json_string)
     expect(response.code).to eq(201)
     expect(response.body_hash).to eq(@expected_hash)
-    expect(User.find(@valid_name)).not_to be_nil #поменять
+    expect(User.find(@valid_name).age).to eq(@valid_age)
   end
+
+  it 'MODIFY(negative)' do
+    response = put("/api/user/modify", @json_string)
+    expect(response.code).to eq(404)
+    expect(response.body_string).to eq("User #{@valid_name} is not found to modify")
+    expect(User.find(@valid_name)).to be_nil 
+  end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   # it 'CREATION(negative)' do
   #   response = post("/api/user/new", @invalid_name, @invalid_age)
