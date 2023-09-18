@@ -1,5 +1,3 @@
-require 'pry'
-
 class User
   attr_reader :name, :age, :errors, :valid
 

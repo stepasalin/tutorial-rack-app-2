@@ -1,4 +1,5 @@
 class Response
+
   def initialize(response_array)
     @response_array = response_array
   end
@@ -8,7 +9,11 @@ class Response
   end
   
   def body_string
-    @response_array[2][0]
+    if @response_array[2].count == 1
+      @response_array[2][0]
+    else
+      @response_array[2]
+    end
   end
   
   def body_hash
@@ -17,6 +22,7 @@ class Response
     JSON.parse(body_string)
   end
 end
+
 
 def generate_random_valid_name
   alphabet = ('a'..'z').to_a + ('A'..'Z').to_a
@@ -74,5 +80,13 @@ def put(path, json_string)
   response = Response.new(response_array)
 end
 
-def delete()
+def delete(path, json_string)
+  req_params = {
+    'REQUEST_PATH' => path,
+    'PATH_INFO'=> path,
+    'REQUEST_METHOD' => 'DELETE',
+    'rack.input' => StringIO.new(json_string)
+    }
+  response_array = app.call(req_params)
+  response = Response.new(response_array)
 end
